@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: forklol-web
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: forklol
+        tier: forklol-frontend
+    spec:
+      containers:
+        - image: eu.gcr.io/splendid-sled-172714/forklol-web:v0.36.14
+          name: forklol-web
+          resources:
+            requests:
+              cpu: 10m
+              memory: 10Mi
+          ports:
+          - containerPort: 80
+          env:
+            - name: GET_HOSTS_FROM
+              value: dns

@@ -1,0 +1,10 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: forklol-web-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: forklol-web-ingress
+spec:
+  backend:
+    serviceName: forklol-web
+    servicePort: 80

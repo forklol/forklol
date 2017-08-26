@@ -1,0 +1,6 @@
+required = [
+	"github.com/gorilla/handlers",
+	"github.com/gorilla/mux",
+    "github.com/go-sql-driver/mysql",
+	"github.com/jmoiron/sqlx",
+]
