@@ -8,9 +8,9 @@
             <dt>Email</dt>
             <dd>cixx@cyberdyne.sh</dd>
             <dt>IRC</dt>
-            <dd>trippysalmon @ freenode</dd>
+            <dd>#forklol on freenode</dd>
             <dt>Slack</dt>
-            <dd>trippysalmon @ bitcoincore.slack.com</dd>
+            <dd>trippysalmon on bitcoincore.slack.com</dd>
             <dt>Twitter</dt>
             <dd>
                 <a href="https://twitter.com/trippysalmon">@trippysalmon</a>
