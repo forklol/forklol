@@ -13,4 +13,4 @@ yarn-error.log*
 *.njsproj
 *.sln
 
-./config/dev.env.js
+config/dev.env.js
