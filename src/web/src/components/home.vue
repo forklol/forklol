@@ -195,8 +195,8 @@ export default {
             let at = this.estimate(coin, this.data[coin].averages.last, true)
             let bt = this.estimate(coin2, this.data[coin2].averages.last, true)
 
-            let a = this.next_dari(coin, this.data[coin].averages.last)
-            let b = this.next_dari(coin2, this.data[coin2].averages.last)
+            let a = this.data[coin].averages.last.dari
+            let b = this.data[coin2].averages.last.dari
 
             let tbd = `<span class="mini">(<span class="disadvantage_sm_x">T.B.D.</span>)</span>`
 
@@ -205,9 +205,11 @@ export default {
             }
 
             if(at < bt) {
-                b = this.data[coin2].averages.last.dari
-            } else {
                 a = this.data[coin].averages.last.dari
+                a = a / this.next_pct(coin, true) 
+            } else {
+                b = this.data[coin].averages.last.dari
+                b = b / this.next_pct(coin, true)
             }
 
             let pct = a / b
