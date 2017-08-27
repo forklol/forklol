@@ -46,13 +46,13 @@ Code review MUCH appreciated!
 - [ ] ...
 
 ##### Charts:
-- [ ] Switch to highcharts/ploty (chart.js lacks some features)
-- [ ] Percentage of coins spent since fork (thanks to Felix Weis)
+- [ ] Switch to highcharts/plotly (chart.js lacks some features)
+- [ ] Percentage of coins spent since fork (thanks to Felix Weis) (*)
 - [ ] Add income rate (USD) per hour (total reward per hour)
 - [ ] Add tx fee rate (USD) per hour
 - [ ] Add reorg attack costs (USD) for 10, 50, 100 (?) blocks
 - [ ] Add costs (USD) to fill up 100MB(?) of blockspace (perhaps multiply with node count?) *
-- [ ] Add mempool size statistics (tx fee catergories)
+- [ ] Add mempool size statistics (tx fee catergories) *
 - [ ] Add transaction type statistics (p2pkh, p2sh, p2wph, etc.) *
 - [ ] UTXO stats *
 - [ ] Total block chain size *
