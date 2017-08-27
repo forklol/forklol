@@ -31,9 +31,8 @@
                         <small>({{ left('BTC') }} blk)</small>    
                     </td>
                     <td>
-                        <i v-if="next_pct('BTC') > 0" class="fa fa-chevron-up up"></i>
-                        <i v-if="next_pct('BTC') < 0" class="fa fa-chevron-down down"></i>
-                        <i v-if="next_pct('BTC') === null" class="fa fa-chevron-right"></i>
+                        <i v-if="next_pct('BTC', true) > 1" class="fa fa-chevron-up up"></i>
+                        <i v-if="next_pct('BTC', true) < 1" class="fa fa-chevron-down down"></i>
                         {{ next('BTC') }}
                     </td>
                 </tr>
@@ -45,9 +44,8 @@
                         <small>({{ left('BCH') }} blk)</small>    
                     </td>
                     <td>
-                        <i v-if="next_pct('BCH') > 0" class="fa fa-chevron-up up"></i>
-                        <i v-if="next_pct('BCH') < 0" class="fa fa-chevron-down down"></i>
-                        <i v-if="next_pct('BCH') === null" class="fa fa-chevron-right"></i>
+                        <i v-if="next_pct('BCH', true) > 1" class="fa fa-chevron-up up"></i>
+                        <i v-if="next_pct('BCH', true) < 1" class="fa fa-chevron-down down"></i>
                         {{ next('BCH') }}
                     </td>
                 </tr>
@@ -156,9 +154,18 @@ export default {
 
         },
         next(coin) {
-            let change = this.next_pct(coin)
+            let change = this.next_pct(coin, true)
             if (change === null) return 'T.B.D.'
-            return change > 0 ? this.sprintf('+%.2f%%', change) : this.sprintf('%.2f%%', change)
+
+            let pct = 0
+
+            if (change > 1) {
+                pct = (change - 1) / 1 * 100
+            } else {
+                pct = (1 - change) / 1 * 100
+            }
+
+            return change > 1 ? this.sprintf('+%.2f%%', pct) : this.sprintf('-%.2f%%', pct)
         },
         left(coin) {
             let h = this.data[coin].averages.last.height

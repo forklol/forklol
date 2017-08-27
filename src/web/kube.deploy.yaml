@@ -11,7 +11,7 @@ spec:
         tier: forklol-frontend
     spec:
       containers:
-        - image: eu.gcr.io/splendid-sled-172714/forklol-web:v0.36.17
+        - image: eu.gcr.io/splendid-sled-172714/forklol-web:v0.36.20
           name: forklol-web
           resources:
             requests:
