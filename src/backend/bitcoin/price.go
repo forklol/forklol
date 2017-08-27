@@ -1,6 +1,7 @@
 package bitcoin
 
 import (
+	"backend/config"
 	"backend/db"
 	"crypto/hmac"
 	"crypto/sha256"
@@ -83,6 +84,10 @@ func fetchPrice(coin Coin) (float64, error) {
 		Last float64 `json:"last"`
 	}{}
 
+	if config.OPTIONS.Debug == true {
+		time.Sleep(time.Millisecond * 750)
+	}
+
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return 0.0, errors.New("Could not decode price response")
@@ -98,6 +103,10 @@ func fetchHistoricalPrice(coin Coin, timestamp int64) (float64, error) {
 	data := struct {
 		Average float64 `json:"average"`
 	}{}
+
+	if config.OPTIONS.Debug == true {
+		time.Sleep(time.Millisecond * 750)
+	}
 
 	err = json.Unmarshal(body, &data)
 	if err != nil {

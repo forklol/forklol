@@ -33,6 +33,8 @@ import Security from '../components/security.vue'
 import SecurityFork from '../components/charts/rewrite-fork.vue'
 import SecurityChain from '../components/charts/rewrite-chain.vue'
 
+import HashDari from '../components/pages/hashdari.vue'
+
 import Contact from '../components/contact.vue'
 
 const router = new Router({
@@ -43,6 +45,10 @@ const router = new Router({
     path: '/',
     name: 'home',
     component: Home,
+  }, {
+    path: '/hashdari',
+    name: 'hashdari',
+    component: HashDari
   }, {
     path: '/reward',
     name: 'reward',
@@ -134,7 +140,7 @@ const router = new Router({
       path: '/tx/txs',
       name: 'tx.txs',
       component: TxTxs
-    },{
+    }, {
       path: '/tx/fee',
       name: 'tx.fee',
       component: TxFee
