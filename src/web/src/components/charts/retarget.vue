@@ -10,7 +10,7 @@
         <br>
         <small>
         <p>
-            Estimated next difficulty. The 12 hour hashrate average is used to make a prediction about upcoming blocks in the period. Please note that because of the BCH EDA exploit these number can be inaccurate right after difficulty changes.
+            Estimated next difficulty. The 12 hour hashrate average is used to make a prediction about upcoming blocks in the period. Please note that because of the BCH EDA mechanism these number can be inaccurate right after difficulty changes.
         </p>
 
         <table class="table table-sm table-bordered">

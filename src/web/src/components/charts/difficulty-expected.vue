@@ -9,7 +9,7 @@
         </div>
         <br>
         <p>
-            When the actual difficulty is lower than the expected difficulty it can either mean that new hashrate has been added to the network or a chain difficulty is not well adjusted (e.g. BCH EDA exploit).
+            When the actual difficulty is lower than the expected difficulty it can either mean that new hashrate has been added to the network or a chain difficulty is not well adjusted (e.g. BCH EDA mechanism).
         </p>
     </div>
 </template>
