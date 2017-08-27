@@ -62,7 +62,7 @@ export default {
                 label: 'BCH',
                 backgroundColor: this.bch_cbg,
                 borderColor: this.bch_c,
-                data: this.data.BCH.history['all'].map((obj) => this.sprintf('%.2f', obj.size / 1000)),
+                data: this.data.BCH.history['all'].map((obj) => obj.blocks > 0 ? this.sprintf('%.2f', obj.size / 1000) : null),
                 fill: true
             })
 

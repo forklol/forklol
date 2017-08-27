@@ -84,6 +84,11 @@
             <tbody>
                 <tr>
                     <td>
+                        Disabled "spanning gaps" in charts when it's not appropriate.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         Added <router-link to="pow/difficulty#exp">expected vs actual</router-link> difficulty chart.
                     </td>
                 </tr>

@@ -46,13 +46,15 @@ export default {
             this.add_dataset({
                 label: 'BTC',
                 borderColor: this.btc_c,
-                data: this.data.BTC.history['all'].map((obj) => this.work(obj))
+                data: this.data.BTC.history['all'].map((obj) => this.work(obj)),
+                spanGaps: true
             })
 
             this.add_dataset({
                 label: 'BCH',
                 borderColor: this.bch_c,
-                data: this.data.BCH.history['all'].map((obj) => this.work(obj))
+                data: this.data.BCH.history['all'].map((obj) => this.work(obj)),
+                spanGaps: true
             })
 
             var config = {

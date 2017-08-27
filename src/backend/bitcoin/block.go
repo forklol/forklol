@@ -343,7 +343,7 @@ func groupBlocks(coin Coin, values *[]Block, start uint64, interval uint64) (*[]
 		groups = append(groups, calculateGroup(&group, now))
 	}
 
-	linearFill(&groups)
+	//linearFill(&groups)
 
 	return &groups, nil
 }

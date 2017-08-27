@@ -43,7 +43,8 @@ export default {
                 label: 'BTC',
                 borderColor: this.btc_c,
                 data: this.data.BTC.history['all'].map((obj) => this.obj_dari(obj)),
-                yAxisID: 'dari'
+                yAxisID: 'dari',
+                spanGaps: true
             })
 
             this.add_dataset({
@@ -51,14 +52,16 @@ export default {
                 borderColor: this.btc_c,
                 borderDash: [3, 3],
                 data: this.data.BTC.history['all'].map((obj) => this.obj_diff(obj)),
-                yAxisID: 'diff'
+                yAxisID: 'diff',
+                spanGaps: true
             })
 
             this.add_dataset({
                 label: 'BCH',
                 borderColor: this.bch_c,
                 data: this.data.BCH.history['all'].map((obj) => this.obj_dari(obj)),
-                yAxisID: 'dari'
+                yAxisID: 'dari',
+                spanGaps: true
             })
 
             this.add_dataset({
@@ -66,7 +69,8 @@ export default {
                 borderColor: this.bch_c,
                 borderDash: [3, 3],
                 data: this.data.BCH.history['all'].map((obj) => this.obj_diff(obj)),
-                yAxisID: 'diff'
+                yAxisID: 'diff',
+                spanGaps: true
             })
 
             var config = {

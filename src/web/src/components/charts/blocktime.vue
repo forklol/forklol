@@ -68,13 +68,14 @@ export default {
             let labels = this.data.BTC.history['all'].map((obj) => moment.unix(obj.timestamp).format("MMM, DD HH:mm"))
             labels.splice(-1, 1)
 
-            let t =this.period_time()
-            let blocktime = (obj) => {
-                return obj.blocks > 0 ? (sprintf('%.2f', 3600 / t * obj.blocks)) : null
+            let t = this.period_time()
+            let blocktime = (obj, coin) => {
+                let b = 3600 / t * obj.blocks
+                return obj.blocks > 0 ? (sprintf('%.2f', b)) : 0
             }
 
-            let btc_data = this.data.BTC.history['all'].map((obj) => blocktime(obj))
-            let bch_data = this.data.BCH.history['all'].map((obj) => blocktime(obj))
+            let btc_data = this.data.BTC.history['all'].map((obj) => blocktime(obj, 'BTC'))
+            let bch_data = this.data.BCH.history['all'].map((obj) => blocktime(obj, 'BCH'))
 
             btc_data.splice(-1, 1)
             bch_data.splice(-1, 1)
