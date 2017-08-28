@@ -175,13 +175,13 @@ export default {
         dari_period(coin, coin2, p, strong = false) {
             let a = this.data[coin].averages[p]
             let b = this.data[coin2].averages[p]
-            if(a.blocks < 1 || b.blocks < 1) return null
+            if(a.blocks < 1 || b.blocks < 1) return this.current_dari[coin]
 
             let pct = 0
             let space = '______'
 
             if(a.txs === 1 || b.txs === 1) {
-                pct = this.last_dari[coin]
+                return this.current_dari[coin]
             } else {
                 pct = this.data[coin].averages[p].dari / this.data[coin2].averages[p].dari
                 if (pct < 1) pct = 1
@@ -213,8 +213,8 @@ export default {
                 a = this.data[coin].averages.last.dari
                 a = a / this.next_pct(coin, true) 
             } else {
-                b = this.data[coin].averages.last.dari
-                b = b / this.next_pct(coin, true)
+                b = this.data[coin2].averages.last.dari
+                b = b / this.next_pct(coin2, true)
             }
 
             let pct = a / b
