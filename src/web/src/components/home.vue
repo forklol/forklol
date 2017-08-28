@@ -84,6 +84,11 @@
             <tbody>
                 <tr>
                     <td>
+                        Fixed issue with rolling hashrate averages. Last block wasn't included in the calculations. Hashrate related charts might look a bit different now on the 3h interval.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         Disabled "spanning gaps" in charts when it's not appropriate.
                     </td>
                 </tr>
@@ -106,23 +111,6 @@
                     <td>
                         Many have asked so here it is:
                         <router-link :to="{name: 'contact'}">donations</router-link>.
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Added
-                        <router-link :to="{name: 'pow.hashrateabs'}">absolute hashrate</router-link> chart.
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Added long polling for live data. No more need to refresh page.
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Added
-                        <router-link :to="{name: 'pow.retarget'}">difficulty retarget</router-link> chart and estimates.
                     </td>
                 </tr>
             </tbody>
