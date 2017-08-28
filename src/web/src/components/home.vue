@@ -28,7 +28,7 @@
                                     <strong>BTC</strong>
                                 </td>
                                 <td>
-                                    <span v-html="dari_period('BTC', 'BCH', 'last', true)"></span>
+                                    <span v-html="current_dari.BTC"></span>
                                     <small v-html="next_dari_coin('BTC', 'BCH')"></small>
                                 </td>
                                 <td v-html="dari_period('BTC', 'BCH', '6h')"></td>
@@ -41,7 +41,7 @@
                                 </td>
 
                                 <td>
-                                    <span v-html="dari_period('BCH', 'BTC', 'last', true)"></span>
+                                    <span v-html="current_dari.BCH"></span>
                                     <small v-html="next_dari_coin('BCH', 'BTC')"></small>
                                 </td>
                                 <td v-html="dari_period('BCH', 'BTC', '6h')"></td>
@@ -143,7 +143,11 @@ export default {
     data() {
         return {
             chart: null,
-            last_dari: {'BTC': 1, 'BCH': 1}
+            last_dari: {'BTC': 1, 'BCH': 1},
+            current_dari: {
+                'BTC': 1, 
+                'BCH': 1
+            }
         }
     },
     computed: {
@@ -169,6 +173,14 @@ export default {
         },
         empty_any() {
             return false //this.data.BTC.averages.last.txs === 1 || this.data.BCH.averages.last.txs === 1
+        },
+        poll() {
+            return this.$store.getters['poll']
+        }
+    },
+    watch: {
+        poll() {
+            this.calc_current_dari()
         }
     },
     methods: {
@@ -248,9 +260,13 @@ export default {
 
             return m === false ? this.sprintf('%.2f', days) : mins
         },
+        calc_current_dari() {
+            this.current_dari.BTC = this.dari_period('BTC', 'BCH', 'last', true)
+            this.current_dari.BCH = this.dari_period('BCH', 'BTC', 'last', true)
+        }
     },
     mounted() {
-
+        this.calc_current_dari()
     },
 }
 </script>
