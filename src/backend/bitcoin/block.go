@@ -75,6 +75,21 @@ const QRY_INSERT = `
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
+const QRY_UPDATE = `
+	UPDATE
+		blocks
+	SET
+		rate3h = ?,
+		rate12h = ?,
+		rate1d = ?,
+		rate3d = ?,
+		rate7d = ?
+	WHERE
+		coin = ?
+	AND
+		height = ?
+`
+
 const QRY_SELECT = `
     SELECT
         b.coin as coin, 
@@ -225,6 +240,8 @@ func importBlocks(from uint64, coin Coin) (bool, error) {
 		return false, err
 	}
 
+	dbConn := db.GetDB()
+
 	for _, block := range blocks {
 
 		if block.Height > CHAINSPLIT_HEIGHT {
@@ -239,18 +256,16 @@ func importBlocks(from uint64, coin Coin) (bool, error) {
 			return false, err
 		}
 
+		tx := dbConn.MustBegin()
+
 		log.Printf("Imported %s price of %.2f for block %d @ %s\n", coin.Symbol, price, block.Height, block.Date)
 		index := float64(block.Reward) / block.Difficulty * price
-		_, err = db.GetDB().Exec(QRY_INSERT,
+		res := tx.MustExec(QRY_INSERT,
 			coin.Symbol,
 			block.Height,
 			block.Difficulty,
 			work.Work,
-			getHashRatePeriod(coin, then-(1*24*3600), then),
-			getHashRatePeriod(coin, then-(3*24*3600), then),
-			getHashRatePeriod(coin, then-(7*24*3600), then),
-			getHashRatePeriod(coin, then-(3*3600), then),
-			getHashRatePeriod(coin, then-(12*3600), then),
+			0, 0, 0, 0, 0,
 			block.Reward,
 			index,
 			block.Size,
@@ -258,10 +273,33 @@ func importBlocks(from uint64, coin Coin) (bool, error) {
 			block.CDD,
 			block.Date.Unix())
 
-		if err != nil {
+		if _, err := res.RowsAffected(); err != nil {
 			log.Printf("Could not insert block: %s\n", err.Error())
+			tx.Rollback()
 			return false, err
 		}
+
+		tx.Commit() // need to commit else the block is skipped in hashrate calculations
+
+		tx = dbConn.MustBegin()
+
+		res = tx.MustExec(QRY_UPDATE,
+			getHashRatePeriod(coin, then-(3*3600), then),
+			getHashRatePeriod(coin, then-(12*3600), then),
+			getHashRatePeriod(coin, then-(1*24*3600), then),
+			getHashRatePeriod(coin, then-(3*24*3600), then),
+			getHashRatePeriod(coin, then-(7*24*3600), then),
+			coin.Symbol,
+			block.Height,
+		)
+
+		if _, err := res.RowsAffected(); err != nil {
+			log.Printf("Could not update block: %s\n", err.Error())
+			tx.Rollback()
+			return false, err
+		}
+
+		tx.Commit()
 	}
 
 	return true, nil

@@ -76,7 +76,12 @@ func startApi(coins []bitcoin.Coin) {
 }
 
 func fetchRoutine(coins []bitcoin.Coin, c chan bool) {
-	ticker := time.NewTicker(time.Second * 5).C
+	var interval time.Duration = 5
+	if config.OPTIONS.Debug == true {
+		interval = 15
+	}
+
+	ticker := time.NewTicker(time.Second * interval).C
 
 	log.Println("Prefetching data..")
 	saveStats(coins)

@@ -18,12 +18,12 @@ spec:
               memory: 25Mi
           ports:
           - containerPort: 8888
-        - image: eu.gcr.io/splendid-sled-172714/forklol-api:v0.48
+        - image: eu.gcr.io/splendid-sled-172714/forklol-api:v0.49
           name: forklol-api
           resources:
             requests:
               cpu: 100m
-              memory: 100Mi
+              memory: 256Mi
           ports:
           - containerPort: 8000
           env:
