@@ -9,6 +9,7 @@ import (
 type Block struct {
 	Coin       string  `json:"-" db:"coin"`
 	Height     uint64  `json:"height" db:"height"`
+	Hash       string  `json:"hash" db:"hash"`
 	Difficulty float64 `json:"difficulty" db:"difficulty"`
 	Work       float64 `json:"work" db:"work"`
 	Rate1d     float64 `json:"rate1d" db:"rate1d"`

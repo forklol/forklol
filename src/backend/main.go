@@ -93,6 +93,7 @@ func fetchRoutine(coins []bitcoin.Coin, c chan bool) {
 			if saveStats(coins) {
 				c <- true
 			}
+
 		}
 	}
 }

@@ -17,6 +17,7 @@ import (
 
 type BlockData struct {
 	Height     uint32
+	Hash       string
 	Date       time.Time
 	Reward     uint64
 	Size       float64
@@ -58,7 +59,8 @@ const CHAINSPLIT_TIMESTAMP = 1501593374
 const QRY_INSERT = `
     INSERT INTO blocks (
         coin, 
-        height, 
+		height, 
+		hash,
         difficulty, 
         work,
         rate1d,
@@ -72,7 +74,7 @@ const QRY_INSERT = `
         txs,
         cdd,
         timestamp
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 const QRY_UPDATE = `
@@ -172,7 +174,7 @@ func SyncBlocks(coin Coin) (bool, error) {
 }
 
 func importBlocks(from uint64, coin Coin) (bool, error) {
-	url := fmt.Sprintf("https://api.blockchair.com/%s/blocks?q=id(%d..)&s=id(asc)&fields=id,time,reward,size,difficulty,transaction_count,cdd_total&export=csv", coin.BlockchairURL, from)
+	url := fmt.Sprintf("https://api.blockchair.com/%s/blocks?q=id(%d..)&s=id(asc)&fields=id,time,reward,size,difficulty,transaction_count,cdd_total,hash&export=csv", coin.BlockchairURL, from)
 	resp, err := http.Get(url)
 	if err != nil {
 		return false, err
@@ -189,6 +191,8 @@ func importBlocks(from uint64, coin Coin) (bool, error) {
 		log.Println("No new blocks found for " + coin.Symbol)
 		return false, nil
 	}
+
+	RPCConnect()
 
 	csv := csv.NewReader(strings.NewReader(string(data)))
 
@@ -219,9 +223,13 @@ func importBlocks(from uint64, coin Coin) (bool, error) {
 			diff, _ := strconv.ParseFloat(record[4], 64)
 			txs, _ := strconv.ParseUint(record[5], 10, 64)
 			cdd, _ := strconv.ParseFloat(record[6], 64)
+			hash := record[7]
+
+			GetBlockTxStats(hash)
 
 			blocks = append(blocks, BlockData{
 				Height:     uint32(height),
+				Hash:       hash,
 				Date:       blocktime,
 				Reward:     reward,
 				Size:       size,
@@ -233,6 +241,8 @@ func importBlocks(from uint64, coin Coin) (bool, error) {
 			return false, err
 		}
 	}
+
+	RPCDisconnect()
 
 	work, err := GetWorkTotal(coin)
 	if err != nil {
@@ -263,6 +273,7 @@ func importBlocks(from uint64, coin Coin) (bool, error) {
 		res := tx.MustExec(QRY_INSERT,
 			coin.Symbol,
 			block.Height,
+			block.Hash,
 			block.Difficulty,
 			work.Work,
 			0, 0, 0, 0, 0,
@@ -381,42 +392,7 @@ func groupBlocks(coin Coin, values *[]Block, start uint64, interval uint64) (*[]
 		groups = append(groups, calculateGroup(&group, now))
 	}
 
-	//linearFill(&groups)
-
 	return &groups, nil
-}
-
-func linearFill(data *[]*ChainAverage) {
-	prev := 0
-
-	for n := 0; n < len(*data); n++ {
-		if (*data)[n].Blocks > 0 {
-			if prev < n-1 && prev > 0 {
-				// we've got a gap ho ho ho. fill 'er up boys!
-				for c := 0; c < n-prev; c++ {
-					diff := float64(n - prev)
-					p := (*data)[prev]
-
-					(*data)[prev+c].Work = p.Work - (p.Work-(*data)[n].Work)/diff*(float64(c)+1)
-					(*data)[prev+c].Rate1d = p.Rate1d - (p.Rate1d-(*data)[n].Rate1d)/diff*(float64(c)+1)
-					(*data)[prev+c].Rate3d = p.Rate3d - (p.Rate3d-(*data)[n].Rate3d)/diff*(float64(c)+1)
-					(*data)[prev+c].Rate7d = p.Rate7d - (p.Rate7d-(*data)[n].Rate7d)/diff*(float64(c)+1)
-					(*data)[prev+c].Rate3h = p.Rate3h - (p.Rate3h-(*data)[n].Rate3h)/diff*(float64(c)+1)
-					(*data)[prev+c].Rate12h = p.Rate12h - (p.Rate12h-(*data)[n].Rate12h)/diff*(float64(c)+1)
-					(*data)[prev+c].AvgDiff = p.AvgDiff - (p.AvgDiff-(*data)[n].AvgDiff)/diff*(float64(c)+1)
-					(*data)[prev+c].AvgReward = p.AvgReward - (p.AvgReward-(*data)[n].AvgReward)/diff*(float64(c)+1)
-					(*data)[prev+c].Blocks = p.Blocks - (p.Blocks-(*data)[n].Blocks)/diff*(float64(c)+1)
-					(*data)[prev+c].CoinPrice = p.CoinPrice - (p.CoinPrice-(*data)[n].CoinPrice)/diff*(float64(c)+1)
-					(*data)[prev+c].DARI = p.DARI - (p.DARI-(*data)[n].DARI)/diff*(float64(c)+1)
-					(*data)[prev+c].TotalReward = p.TotalReward - (p.TotalReward-(*data)[n].TotalReward)/diff*(float64(c)+1)
-					(*data)[prev+c].Size = p.Size - (p.Size-(*data)[n].Size)/diff*(float64(c)+1)
-					(*data)[prev+c].Txs = p.Txs - (p.Txs-(*data)[n].Txs)/diff*(float64(c)+1)
-					(*data)[prev+c].CDD = p.CDD - (p.CDD-(*data)[n].CDD)/diff*(float64(c)+1)
-				}
-			}
-			prev = n
-		}
-	}
 }
 
 func calculateGroup(group *[]*Block, timestamp uint64) *ChainAverage {
