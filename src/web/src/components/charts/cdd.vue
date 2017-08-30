@@ -2,7 +2,7 @@
 <template>
     <div>
         <p>
-            Sum of coindays destroyed in period.
+            Sum of coindays destroyed in period (log scale).
         </p>
         <div style="height:100%; width: 100%;">
             <canvas id="canvas-cdd" style="height: 512px;"></canvas>
@@ -73,13 +73,16 @@ export default {
                         yAxes: [{
                             display: true,
                             position: 'right',
+                            type: 'logarithmic',
                             scaleLabel: {
                                 display: true,
                                 labelString: 'Coindays destroyed'
                             },
                             ticks: {
-                                callback: (value, index, values) => {
-                                    return this.numeral('0,0', value)
+                                callback: (value, index, ticks) => {
+                                    if (!(index % parseInt(ticks.length / 10))) {
+                                        return this.numeral('0,0', value)
+                                    }
                                 }
                             }
                         }]
