@@ -2,12 +2,13 @@
 
 More docs coming soon...
 
+<!> Currently working on a rewrite of the backend using full nodes instead of an external API. </!>
+
 See the `src/web` directory for the web frontend. Most of the calculations for the charts are being done there except for the hashrate averages, these are done (partly) in the `src/backend` project (see bitcoin/difficulty.go).
 
 More info on the front and back-end in `/src/web` and `src/backend` README's.
 
 
-Code review MUCH appreciated!
 
 
 #### TODO
