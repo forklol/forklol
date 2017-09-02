@@ -75,6 +75,44 @@
 
         <dari></dari>
         <br>
+        <small>
+            <div class="alert alert-warning">
+                <div class="msgicon"><i class="fa fa-lightbulb-o"></i></div> I'm currently working on a big update that relies on a full node implementation, making fork.lol independent from external sources for block information. This work will take a while before it's finished but wanted to let everyone know work is being done behind the scenes and many more features will be available once it's done. Thanks for your patience and kinds words I have recieved.
+            </div>
+        </small>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th colspan="2">Currently working on</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <i class="fa fa-square-o fac"></i>
+                        Rewrite backend to use full nodes for block/tx collection.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fa fa-square-o fac"></i>
+                        Refactor and update frontend to make use of new data format.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fa fa-square-o fac"></i>
+                        Push changes to production and monitor behaviour.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fa fa-square-o fac"></i>
+                        Further implementation of new features/charts.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
         <table class="table table-sm">
             <thead>
                 <tr>
@@ -84,33 +122,32 @@
             <tbody>
                 <tr>
                     <td>
+                        <i class="fa fa-warning fac"></i>
                         Fixed issue with rolling hashrate averages. Last block wasn't included in the calculations. Hashrate related charts might look a bit different now on the 3h interval.
                     </td>
                 </tr>
                 <tr>
                     <td>
+                        <i class="fa fa-line-chart fac"></i>
                         Disabled "spanning gaps" in charts when it's not appropriate.
                     </td>
                 </tr>
                 <tr>
                     <td>
+                        <i class="fa fa-lightbulb-o fac"></i>
                         Added <router-link to="pow/difficulty#exp">expected vs actual</router-link> difficulty chart.
                     </td>
                 </tr>
                 <tr>
                     <td>
+                        <i class="fa fa-lightbulb-o fac"></i>
                         Added <router-link :to="{name: 'pow.work'}">total work</router-link> and <router-link :to="{name: 'blocks.height'}">block height</router-link> charts.
                     </td>
                 </tr>
                 <tr>
                     <td>
+                        <i class="fa fa-lightbulb-o fac"></i>
                         Added <router-link :to="{name: 'reward.inflation'}">inflation</router-link> chart.
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Many have asked so here it is:
-                        <router-link :to="{name: 'contact'}">donations</router-link>.
                     </td>
                 </tr>
             </tbody>
@@ -302,5 +339,16 @@ th>sup {
     .canvas-wrapper {
         height: 60%;
     }
+}
+
+.msgicon {
+    display: inline-block;
+    width: 16px;
+    text-align: center;
+}
+
+.fac {
+    display: inline-block;
+    width: 20px;
 }
 </style>
