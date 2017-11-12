@@ -43,6 +43,7 @@ type ChainAverage struct {
 	Rate7d      float64 `json:"rate7d" db:"rate7d"`
 	Rate3h      float64 `json:"rate3h" db:"rate3h"`
 	Rate12h     float64 `json:"rate12h" db:"rate12h"`
+	RateP       float64 `json:"ratep"`
 	TotalReward float64 `json:"reward_total" db:"reward_total"`
 	AvgReward   float64 `json:"reward_avg" db:"reward_avg"`
 	CoinPrice   float64 `json:"price" db:"price"`
@@ -186,16 +187,16 @@ func importBlocks(from uint64, coin Coin) (bool, error) {
 
 	var dummy map[string]interface{}
 	if err := json.Unmarshal(data, &dummy); err == nil {
-		log.Println("No new blocks found for " + coin.Symbol)
+		//log.Println("No new blocks found for " + coin.Symbol)
 		return false, nil
 	}
 
-	csv := csv.NewReader(strings.NewReader(string(data)))
+	csvdata := csv.NewReader(strings.NewReader(string(data)))
 
 	blocks := make([]BlockData, 0, 256)
 	start := true
 	for {
-		record, err := csv.Read()
+		record, err := csvdata.Read()
 		if err == io.EOF {
 			break
 		}
@@ -284,11 +285,11 @@ func importBlocks(from uint64, coin Coin) (bool, error) {
 		tx = dbConn.MustBegin()
 
 		res = tx.MustExec(QRY_UPDATE,
-			getHashRatePeriod(coin, then-(3*3600), then),
-			getHashRatePeriod(coin, then-(12*3600), then),
-			getHashRatePeriod(coin, then-(1*24*3600), then),
-			getHashRatePeriod(coin, then-(3*24*3600), then),
-			getHashRatePeriod(coin, then-(7*24*3600), then),
+			GetHashRatePeriod(coin, then-(3*3600), then),
+			GetHashRatePeriod(coin, then-(12*3600), then),
+			GetHashRatePeriod(coin, then-(1*24*3600), then),
+			GetHashRatePeriod(coin, then-(3*24*3600), then),
+			GetHashRatePeriod(coin, then-(7*24*3600), then),
 			coin.Symbol,
 			block.Height,
 		)
@@ -305,7 +306,7 @@ func importBlocks(from uint64, coin Coin) (bool, error) {
 	return true, nil
 }
 
-func getHashRatePeriod(coin Coin, from, to uint64) float64 {
+func GetHashRatePeriod(coin Coin, from, to uint64) float64 {
 	if coin.Symbol == "BCH" && from < 1501593374 {
 		from = 1501593374
 	} else if coin.Symbol == "BTC" && from < 1501268136 {
@@ -369,7 +370,10 @@ func groupBlocks(coin Coin, values *[]Block, start uint64, interval uint64) (*[]
 				break
 			}
 		}
-		groups = append(groups, calculateGroup(&group, n))
+		grp := calculateGroup(&group, n)
+		grp.RateP = GetHashRatePeriod(coin, n, n+interval)
+
+		groups = append(groups, grp)
 		group = make([]*Block, 0, 32)
 	}
 
@@ -378,7 +382,11 @@ func groupBlocks(coin Coin, values *[]Block, start uint64, interval uint64) (*[]
 			group = append(group, &(*values)[i])
 			idx++
 		}
-		groups = append(groups, calculateGroup(&group, now))
+
+		grp := calculateGroup(&group, now)
+		grp.RateP = GetHashRatePeriod(coin, now-interval, now)
+
+		groups = append(groups, grp)
 	}
 
 	//linearFill(&groups)

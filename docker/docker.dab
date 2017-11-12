@@ -1,0 +1,16 @@
+{
+  "Services": {
+    "db": {
+      "Env": [
+        "MYSQL_ROOT_PASSWORD=forklol", 
+        "MYSQL_PASSWORD=forklol", 
+        "MYSQL_USER=forklol"
+      ], 
+      "Image": "mysql@sha256:1a2f9361228e9b10b4c77a651b460828514845dc7ac51735b919c2c4aec864b7", 
+      "Networks": [
+        "main"
+      ]
+    }
+  }, 
+  "Version": "0.1"
+}

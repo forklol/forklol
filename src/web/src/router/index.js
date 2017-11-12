@@ -4,11 +4,14 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 import Home from '../components/home.vue'
+import Summary from '../components/summary.vue'
 
 import Reward from '../components/reward.vue'
 import RewardBlocks from '../components/charts/blockreward.vue'
 import RewardFees from '../components/charts/fees.vue'
 import RewardOpportunity from '../components/charts/opportunity.vue'
+import RewardDARI from '../components/charts/dari.vue'
+import RewardAlgo from '../components/charts/algo.vue'
 import RewardFeepct from '../components/charts/feepct.vue'
 import RewardInflation from '../components/charts/inflation.vue'
 
@@ -34,6 +37,8 @@ import SecurityFork from '../components/charts/rewrite-fork.vue'
 import SecurityChain from '../components/charts/rewrite-chain.vue'
 
 import HashDari from '../components/pages/hashdari.vue'
+import BCH from '../components/charts/coin/daa.vue'
+import BTC from '../components/charts/coin/btc.vue'
 
 import Contact from '../components/contact.vue'
 
@@ -44,17 +49,41 @@ const router = new Router({
   routes: [{
     path: '/',
     name: 'home',
-    component: Home,
+    component: Summary,
   }, {
     path: '/hashdari',
     name: 'hashdari',
     component: HashDari
   }, {
+    path: '/coin/bch',
+    name: 'coin.bch',
+    component: BCH
+  }, {
+    path: '/coin/btc',
+    name: 'coin.btc',
+    component: BTC
+  }, {
     path: '/reward',
     name: 'reward',
     component: Reward,
-    redirect: { name: 'reward.blocks' },
+    redirect: {name: 'reward.dari.btc'},
     children: [{
+      path: '/reward/dari',
+      name: 'reward.dari',
+      component: RewardDARI,
+      redirect: {name: 'reward.dari.btc'},
+      children: [{
+        path: '/reward/dari/btc',
+        name: 'reward.dari.btc',
+        component: RewardAlgo,
+        props: {coin: 'BTC'}
+      }, {
+        path: '/reward/dari/bch',
+        name: 'reward.dari.bch',
+        component: RewardAlgo,
+        props: {coin: 'BCH'}
+      }]
+    }, {
       path: '/reward/blocks',
       name: 'reward.blocks',
       component: RewardBlocks
@@ -65,11 +94,11 @@ const router = new Router({
     }, {
       path: '/reward/opportunity',
       name: 'reward.opportunity',
-      redirect: { name: 'home' }
+      redirect: {name: 'home'}
     }, {
       path: '/reward/lossgain',
       name: 'reward.lossgain',
-      redirect: { name: 'reward.opportunity' }
+      redirect: {name: 'reward.opportunity'}
     }, {
       path: '/reward/inflation',
       name: 'reward.inflation',
@@ -83,7 +112,7 @@ const router = new Router({
     path: '/pow',
     name: 'pow',
     component: Pow,
-    redirect: { name: 'pow.hashrateabs' },
+    redirect: {name: 'pow.hashrateabs'},
     children: [{
       path: '/pow/hashrate',
       name: 'pow.hashrate',
@@ -95,7 +124,7 @@ const router = new Router({
     }, {
       path: '/pow/hashrateabs',
       name: 'pow.hashrateabs',
-      redirect: { name: 'pow.hashrate' }
+      redirect: {name: 'pow.hashrate'}
     }, {
       path: '/pow/difficulty',
       name: 'pow.difficulty',
@@ -113,7 +142,7 @@ const router = new Router({
     path: '/blocks',
     name: 'blocks',
     component: Blocks,
-    redirect: { name: 'blocks.time' },
+    redirect: {name: 'blocks.time'},
     children: [{
       path: '/blocks/time',
       name: 'blocks.time',
@@ -135,7 +164,7 @@ const router = new Router({
     path: '/tx',
     name: 'tx',
     component: Tx,
-    redirect: { name: 'tx.txs' },
+    redirect: {name: 'tx.txs'},
     children: [{
       path: '/tx/txs',
       name: 'tx.txs',
@@ -149,7 +178,7 @@ const router = new Router({
     path: '/security',
     name: 'security',
     component: Security,
-    redirect: { name: 'security.fork' },
+    redirect: {name: 'security.fork'},
     children: [{
       path: '/security/fork',
       name: 'security.fork',

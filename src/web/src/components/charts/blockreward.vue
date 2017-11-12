@@ -85,7 +85,7 @@ export default {
                             position: 'right',
                             scaleLabel: {
                                 display: true,
-                                labelString: 'Blockreward (USD)'
+                                labelString: 'Block reward (USD)'
                             },
                             ticks: {
                                 callback: (value, index, values) => {

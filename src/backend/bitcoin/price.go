@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"sync"
 )
 
 var api_pubkey, api_secret string
@@ -21,6 +22,42 @@ var api_pubkey, api_secret string
 func SetBitcoinAverageApiCreds(pub, secret string) {
 	api_pubkey = pub
 	api_secret = secret
+}
+
+var ExchangeRates map[string]float64
+var ExchangeRateJson *[]byte
+
+var ExchangeRateLock sync.RWMutex
+
+func UpdatePrices(coins []Coin) {
+	for _, coin := range coins {
+		p, err := fetchPrice(coin)
+		if err == nil {
+			ExchangeRates[coin.Symbol] = p
+		}
+	}
+
+	ExchangeRates["BCH/BTC"] = ExchangeRates["BCH"] / ExchangeRates["BTC"]
+
+	jsonStruct := struct {
+		BTC   float64 `json:"btc"`
+		BCH   float64 `json:"bch"`
+		Ratio float64 `json:"bch/btc"`
+	}{
+		ExchangeRates["BTC"],
+		ExchangeRates["BCH"],
+		ExchangeRates["BCH/BTC"],
+	}
+
+	bts, err := json.Marshal(jsonStruct)
+	if err != nil {
+		log.Printf("Cannot marshal exchangerates to json: %+v\n", err)
+		return
+	}
+
+	ExchangeRateLock.RLock()
+	ExchangeRateJson = &bts
+	ExchangeRateLock.RUnlock()
 }
 
 func fetchBtcAvg(url string) ([]byte, error) {
@@ -56,9 +93,10 @@ func GetPriceDb(coin Coin, height uint32, timestamp int64) (float64, error) {
 		Price float64 `db:"price"`
 	}{}
 	if err := db.GetDB().Get(&p, "SELECT price FROM prices WHERE coin = ? AND height = ?", coin.Symbol, height); err != nil {
-		log.Printf("No db price found, fetching from BitcoinAverage.com\n")
+		log.Printf("%s block #%d price not found, fetching..\n", coin.Symbol, height)
 
 		a, err := fetchHistoricalPrice(coin, int64(timestamp))
+		//a, err := fetchPrice(coin)
 		if err != nil {
 			log.Printf("No price could be fetched for %s @ %d\n", coin.Symbol, height)
 			return 0.0, err
@@ -110,7 +148,7 @@ func fetchHistoricalPrice(coin Coin, timestamp int64) (float64, error) {
 
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		return 0.0, errors.New("Could not decode price response")
+		return 0.0, fmt.Errorf("Could not decode price response: %s", err)
 	}
 
 	return data.Average, nil

@@ -1,6 +1,9 @@
 <template>
     <div>
         <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <router-link class="nav-link" :to="{name: 'reward.dari'}">DARI</router-link>
+          </li>
             <li class="nav-item">
                 <router-link class="nav-link" :to="{name: 'reward.blocks'}">Blocks</router-link>
             </li>

@@ -31,9 +31,15 @@
   packages = [".","reflectx"]
   revision = "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f"
 
+[[projects]]
+  name = "gopkg.in/guregu/null.v3"
+  packages = ["."]
+  revision = "5d2d1e5a9e25088fb9cc0b0f7cb566250eb42bba"
+  version = "v3.2.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8f000f81d6561d5f7bdd754c512637bbd8814a99f76005f84cb97f10fbdbf2d1"
+  inputs-digest = "7a25f2cb004160f48c859d857799cc2997581fcabfff2565dd85504bc2c8d645"
   solver-name = "gps-cdcl"
   solver-version = 1

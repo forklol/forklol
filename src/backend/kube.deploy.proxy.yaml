@@ -10,20 +10,20 @@ spec:
         tier: forklol-backend
     spec:
       containers:
-        - image: eu.gcr.io/splendid-sled-172714/forklol-api-nginx:v0.17
+        - image: eu.gcr.io/splendid-sled-172714/forklol-api-nginx:v0.22
           name: forklol-api-nginx
           resources:
             requests:
-              cpu: 10m
-              memory: 25Mi
+              cpu: 1m
+              memory: 1Mi
           ports:
           - containerPort: 8888
-        - image: eu.gcr.io/splendid-sled-172714/forklol-api:v0.49
+        - image: eu.gcr.io/splendid-sled-172714/forklol-api:v0.70
           name: forklol-api
           resources:
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 1m
+              memory: 1Mi
           ports:
           - containerPort: 8000
           env:

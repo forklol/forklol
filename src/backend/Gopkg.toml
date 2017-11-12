@@ -3,4 +3,5 @@ required = [
 	"github.com/gorilla/mux",
     "github.com/go-sql-driver/mysql",
 	"github.com/jmoiron/sqlx",
+	"gopkg.in/guregu/null.v3"
 ]

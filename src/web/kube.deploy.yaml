@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: forklol-web
 spec:
-  replicas: 3
+  replicas: 2
   template:
     metadata:
       labels:
@@ -11,7 +11,7 @@ spec:
         tier: forklol-frontend
     spec:
       containers:
-        - image: eu.gcr.io/splendid-sled-172714/forklol-web:v0.36.39
+        - image: eu.gcr.io/splendid-sled-172714/forklol-web:v0.38.9
           name: forklol-web
           resources:
             requests:

@@ -6,7 +6,7 @@
         <hr>
         <br>
         <p>
-            Relative hashrate in percentage of total (stacked, <u>3h averages</u>). 
+            Relative hashrate in percentage of total (stacked, <u>3h averages</u>).
         </p>
         <div style="height:512px; width: 100%;">
             <canvas id="canvas-hashrate" style="height: 512px;"></canvas>
@@ -18,7 +18,7 @@
         <br>
         <small>
             <table class="table table-sm table-bordered">
-                <thead class="thead-inverse">
+                <thead class="thead-dark">
                     <tr>
                         <th>Coin</th>
                         <th>3h</th>
@@ -150,7 +150,7 @@ export default {
         },
         perct(coin, avg = false) {
             if(this.data[coin].averages.last.blocks < 1) return null
-            return sprintf('%.2f%%', this.data[coin].averages.last['rate' + avg] / (this.data.BTC.averages.last['rate' + avg] + this.data.BCH.averages.last['rate' + avg]) * 100)
+            return sprintf('%.2f%%', this.data[coin].averages['3h']['rate' + avg] / (this.data.BTC.averages['3h']['rate' + avg] + this.data.BCH.averages['3h']['rate' + avg]) * 100)
         },
         tsrate(coin, ts) {
             let o = this.data[coin].history['all'].find(h => h.timestamp === ts)

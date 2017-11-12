@@ -5,7 +5,6 @@ import (
 	"backend/bitcoin"
 	"backend/config"
 	"backend/db"
-	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -20,6 +19,7 @@ type ChainApiResponse struct {
 	Averages  map[string]*bitcoin.ChainAverage    `json:"averages"`
 	Pow       map[string]interface{}              `json:"pow"`
 	Retargets *[]bitcoin.Retarget                 `json:"retargets"`
+	Summary   *bitcoin.CoinSummary                `json:"summary"`
 }
 
 type BtcAvgResp struct {
@@ -28,9 +28,27 @@ type BtcAvgResp struct {
 
 var port, connstr string
 
+type LastData struct {
+	BTC, BCH uint64
+}
+
 func main() {
 	Init()
-	db.InitDB(connstr)
+
+	retries := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	for _, v := range retries {
+		if err := db.InitDB(connstr); err != nil {
+			log.Printf("#%d) Could not connect to db: %+v\n", v, err)
+			if v == 10 {
+				log.Panicf("EXIT: %+v\n", err)
+			} else {
+				time.Sleep(time.Duration(v) * time.Second)
+				continue
+			}
+		}
+
+		break
+	}
 
 	coins := []bitcoin.Coin{bitcoin.Coin{"BCH", "bitcoin-cash"}, bitcoin.Coin{"BTC", "bitcoin"}}
 
@@ -64,6 +82,7 @@ func Init() {
 	config.OPTIONS.Debug = *dbg
 
 	bitcoin.SetBitcoinAverageApiCreds(*pub, *sec)
+	bitcoin.ExchangeRates = make(map[string]float64)
 
 	connstr = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", *dbuser, *dbpass, *dbhost, *dbport, *dbscheme)
 }
@@ -81,28 +100,45 @@ func fetchRoutine(coins []bitcoin.Coin, c chan bool) {
 		interval = 15
 	}
 
-	ticker := time.NewTicker(time.Second * interval).C
+	ticker := time.NewTicker(time.Second * interval)
+	tickerPrice := time.NewTicker(time.Second * interval)
 
-	log.Println("Prefetching data..")
-	saveStats(coins)
+	log.Println("Prefetching data and saving stats..")
+	go bitcoin.UpdatePrices(coins)
+	saveStats(coins, true)
 
 	for {
 		select {
-		case <-ticker:
-			log.Println("Fetching new data..")
-			if saveStats(coins) {
+		case <-ticker.C:
+			ticker.Stop()
+			log.Println("Fetching new blocks..")
+			if saveStats(coins, false) {
 				c <- true
 			}
+			ticker = time.NewTicker(interval * time.Second)
+		case <-tickerPrice.C:
+			go bitcoin.UpdatePrices(coins)
 		}
 	}
 }
 
-func saveStats(coins []bitcoin.Coin) bool {
+func saveStats(coins []bitcoin.Coin, force bool) bool {
+	start := time.Now()
+
 	newBlocks := false
 
 	for _, coin := range coins {
-		nw, _ := bitcoin.SyncBlocks(coin)
+		nw, err := bitcoin.SyncBlocks(coin)
+		if err != nil {
+			fmt.Printf("Error syncing blocks: %+v\n", err)
+			return false
+		}
 		newBlocks = newBlocks || nw
+	}
+
+	if !newBlocks && !force {
+		log.Printf("No new blocks found.\n")
+		return false
 	}
 
 	apiChains := make(map[string]ChainApiResponse)
@@ -122,7 +158,7 @@ func saveStats(coins []bitcoin.Coin) bool {
 			return false
 		}
 
-		apiChain := ChainApiResponse{history, averages, pow, retargets}
+		apiChain := ChainApiResponse{history, averages, pow, retargets, bitcoin.MakeCoinSummary(coin)}
 
 		factor, err := bitcoin.GetHashFactorInPeriod(coin, now-3*day, now)
 		if err != nil {
@@ -146,14 +182,25 @@ func saveStats(coins []bitcoin.Coin) bool {
 		pow["split"] = split
 		pow["total"] = total
 
-		averages["7d"] = bitcoin.GetBlockAverages(coin, now-(3600*24*7))
-		averages["1d"] = bitcoin.GetBlockAverages(coin, now-(3600*24))
-		averages["12h"] = bitcoin.GetBlockAverages(coin, now-(3600*12))
-		averages["6h"] = bitcoin.GetBlockAverages(coin, now-(3600*6))
-		averages["3h"] = bitcoin.GetBlockAverages(coin, now-(3600*3))
+		/*		averages["7d"] = bitcoin.GetBlockAverages(coin, now-(3600*24*7))
+				averages["1d"] = bitcoin.GetBlockAverages(coin, now-(3600*24))
+				averages["12h"] = bitcoin.GetBlockAverages(coin, now-(3600*12))
+				averages["6h"] = bitcoin.GetBlockAverages(coin, now-(3600*6))
+				averages["3h"] = bitcoin.GetBlockAverages(coin, now-(3600*3))
+				averages["last"] = bitcoin.GetLastBlockAverages(coin)*/
+
+		averages["7d"] = bitcoin.GetLastAverages(coin, now, 3600*24*7)
+		averages["1d"] = bitcoin.GetLastAverages(coin, now, 3600*24)
+		averages["12h"] = bitcoin.GetLastAverages(coin, now, 3600*12)
+		averages["6h"] = bitcoin.GetLastAverages(coin, now, 3600*6)
+		averages["3h"] = bitcoin.GetLastAverages(coin, now, 3600*3)
 		averages["last"] = bitcoin.GetLastBlockAverages(coin)
 
-		history["all"] = bitcoin.GetHistoricalData(coin, bitcoin.CHAINSPLIT_TIMESTAMP, (now-(now-7*day))/72)
+		from := now - (30 * 24 * 3600)
+
+		//history["all"] = bitcoin.GetHistoricalData(coin, bitcoin.CHAINSPLIT_TIMESTAMP, (now-bitcoin.CHAINSPLIT_TIMESTAMP)/256)
+		//history["all"] = bitcoin.GetHistoricalData(coin, from, (now-from)/360)
+		history["all"] = bitcoin.GetHistoricalDataDescending(coin, now, from, (now-from)/360)
 
 		apiChains[coin.Symbol] = apiChain
 	}
@@ -164,9 +211,19 @@ func saveStats(coins []bitcoin.Coin) bool {
 		return false
 	}
 
-	var pretty bytes.Buffer
-	json.Indent(&pretty, data, "", "\t")
-	ioutil.WriteFile(api.JSON_PATH, pretty.Bytes(), 0644)
+	/*	var pretty bytes.Buffer
+		json.Indent(&pretty, data, "", "\t")*/
+	ioutil.WriteFile(api.JSON_PATH, data, 0644)
+
+	last := LastData{
+		BTC: bitcoin.GetLastBlockHeight(bitcoin.Coin{"BTC", ""}),
+		BCH: bitcoin.GetLastBlockHeight(bitcoin.Coin{"BCH", ""}),
+	}
+
+	bts, _ := json.Marshal(last)
+	ioutil.WriteFile(api.JSON_PATH+".last", bts, 0644)
+
+	log.Printf("Done saving stats in %s\n", time.Now().Sub(start))
 
 	return newBlocks
 }

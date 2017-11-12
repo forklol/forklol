@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/conf:/etc/mysql/conf.d
+      - ./assets/forklol.sql.gz:/docker-entrypoint-initdb.d/forklol.sql.gz
+    restart: always
+    ports:
+      - "3308:3306"
+    networks:
+      main:
+        ipv4_address: 10.21.0.10
+        aliases:
+          - mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: forklol
+      MYSQL_USER: forklol
+      MYSQL_PASSWORD: forklol
+  backend:
+    depends_on:
+       - db
+    image: forklol-backend:latest
+    build:
+      dockerfile: ./Dockerfile
+      context: ./src/backend
+    volumes:
+      - ./docker/tmp:/tmp
+    restart: always
+    ports:
+      - "4455:8000"
+    env_file:
+      - ./.docker.env
+    environment:
+      DB_HOST: 10.21.0.10
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: forklol
+      DB_SCHEME: forklol
+    networks:
+      main:
+        ipv4_address: 10.21.0.20
+        aliases:
+          - backend
+  frontend:
+    image: forklol-frontend:latest
+    build:
+      dockerfile: ./Dockerfile
+      context: ./src/web
+      args:
+        version: ${VERSION}
+    restart: always
+    ports:
+      - "4456:80"
+    networks:
+      main:
+        ipv4_address: 10.21.0.30
+        aliases:
+          - frontend
+
+networks:
+  main:
+    external:
+      name: main

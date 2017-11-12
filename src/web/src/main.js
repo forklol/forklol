@@ -1,3 +1,4 @@
+require("jquery")
 require("font-awesome-webpack")
 require('bootstrap-loader')
 

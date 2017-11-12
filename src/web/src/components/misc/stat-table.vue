@@ -2,7 +2,7 @@
     <div>
         <small>
             <table class="table table-sm table-bordered">
-                <thead class="thead-inverse">
+                <thead class="thead-dark">
                     <tr>
                         <th>Coin</th>
                         <th v-for="h in stats.header" v-bind:key="h">{{ h }}</th>

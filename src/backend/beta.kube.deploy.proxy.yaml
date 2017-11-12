@@ -1,0 +1,82 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: forklol-api-beta
+spec:
+  template:
+    metadata:
+      labels:
+        app: forklol-api-beta
+        tier: forklol-backend
+    spec:
+      containers:
+        - image: eu.gcr.io/splendid-sled-172714/forklol-api-nginx:v0.17
+          name: forklol-api-nginx
+          resources:
+            requests:
+              cpu: 10m
+              memory: 25Mi
+          ports:
+          - containerPort: 8888
+        - image: eu.gcr.io/splendid-sled-172714/forklol-api:v0.53
+          name: forklol-api
+          resources:
+            requests:
+              cpu: 10m
+              memory: 96Mi
+          ports:
+          - containerPort: 8000
+          env:
+            - name: GET_HOSTS_FROM
+              value: dns
+            - name: BTCAVG_PUBKEY
+              valueFrom:
+                secretKeyRef:
+                  name: btcavg
+                  key: pubkey
+            - name: BTCAVG_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: btcavg
+                  key: secret
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cloudsql-db-credentials
+                  key: username
+            - name: DB_PASS
+              value: 
+            - name: DB_HOST
+              value: "127.0.0.1"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_SCHEME
+              value: forklol
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+        - image: gcr.io/cloudsql-docker/gce-proxy:1.09
+          name: cloudsql-proxy
+          command: ["/cloud_sql_proxy", "--dir=/cloudsql",
+                      "-instances=splendid-sled-172714:europe-west1:db-1=tcp:3306",
+                      "-credential_file=/secrets/cloudsql/credentials.json"]
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+            - name: ssl-certs
+              mountPath: /etc/ssl/certs
+            - name: cloudsql
+              mountPath: /cloudsql
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+        - name: ssl-certs
+          hostPath:
+            path: /etc/ssl/certs
+        - name: cloudsql
+          emptyDir:
+        - name: tmp
+          emptyDir:
+            medium: "Memory"

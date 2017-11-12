@@ -1,2 +1,5 @@
 /pkg
 /bin
+/docker/mysql
+/docker/tmp
+.docker.env

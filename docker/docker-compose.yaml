@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/conf:/etc/mysql/conf.d
+    restart: always
+    networks:
+      main:
+        ipv4_address: 10.21.0.10
+        aliases:
+          - mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: forklol
+      MYSQL_USER: forklol
+      MYSQL_PASSWORD: forklol
+  backend:
+    build:
+      dockerfile: ../src/backend/Dockerfile
+      context: ../src/backend
+    volumes:
+      - ./docker/tmp:/tmp
+    restart: always
+    ports:
+      - "4455:8000"
+    environment:
+      DB_HOST: 10.21.0.10
+    networks:
+      main:
+        ipv4_address: 10.21.0.20
+        aliases:
+          - backend
+
+networks:
+  main:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 10.21.0.0/16

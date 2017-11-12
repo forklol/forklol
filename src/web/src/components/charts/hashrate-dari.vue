@@ -27,6 +27,8 @@ export default {
         hashrate_dari(coin, obj) {
             let o = this.ts_coin(coin === 'BTC' ? 'BCH' : 'BTC', obj.timestamp)
 
+            if(!o) return null
+
             if(o.blocks === 0 || obj.blocks === 0) {
                 return null
             }

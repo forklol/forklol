@@ -2,7 +2,7 @@
 <template>
     <div>
         <p>
-            Absolute hashrate in exahashes per second (<u>12h averages</u>). 
+            Absolute hashrate in exahashes per second (<u>12h averages</u>).
         </p>
         <div style="height:512px; width: 100%;">
             <canvas id="canvas-hashrateabs" style="height: 512px;"></canvas>
@@ -10,7 +10,7 @@
         <br>
         <small>
             <table class="table table-sm table-bordered">
-                <thead class="thead-inverse">
+                <thead class="thead-dark">
                     <tr>
                         <th>Coin</th>
                         <th>3h</th>
@@ -142,7 +142,7 @@ export default {
         },
         abs(coin, avg = false) {
             if(this.data[coin].averages.last.blocks < 1) return null
-            return sprintf('%.2f', this.data[coin].averages.last['rate' + avg] * Math.pow(2,32) / 600 / Math.pow(10, 18))
+            return sprintf('%.2f', this.data[coin].averages['3h']['rate' + avg] * Math.pow(2,32) / 600 / Math.pow(10, 18))
         },
         tsrate(coin, ts) {
             let o = this.data[coin].history['all'].find(h => h.timestamp === ts)

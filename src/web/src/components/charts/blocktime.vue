@@ -2,7 +2,7 @@
 <template>
     <div>
         <p>
-            Average number of blocks found every hour (log scale).
+            Average number of blocks found every hour.
         </p>
         <div style="height:100%; width: 100%;">
             <canvas id="canvas-blocktime" style="height: 644px;"></canvas>
@@ -10,7 +10,7 @@
         <br>
         <small>
             <table class="table table-sm table-bordered">
-                <thead class="thead-inverse">
+                <thead class="thead-dark">
                     <tr>
                         <th>Coin</th>
                         <th>3h</th>
@@ -66,7 +66,6 @@ export default {
         },
         redraw() {
             let labels = this.data.BTC.history['all'].map((obj) => moment.unix(obj.timestamp).format("MMM, DD HH:mm"))
-            labels.splice(-1, 1)
 
             let t = this.period_time()
             let blocktime = (obj, coin) => {
@@ -76,9 +75,6 @@ export default {
 
             let btc_data = this.data.BTC.history['all'].map((obj) => blocktime(obj, 'BTC'))
             let bch_data = this.data.BCH.history['all'].map((obj) => blocktime(obj, 'BCH'))
-
-            btc_data.splice(-1, 1)
-            bch_data.splice(-1, 1)
 
             this.add_dataset({
                 label: 'BTC',
@@ -106,7 +102,6 @@ export default {
                         yAxes: [{
                             display: true,
                             position: 'right',
-                            type: 'logarithmic',
                             scaleLabel: {
                                 display: true,
                                 labelString: 'Blocks per hour'

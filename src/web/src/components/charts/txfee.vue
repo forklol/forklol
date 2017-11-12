@@ -8,11 +8,6 @@
             <canvas id="canvas-txfee-sat" style="height: 512px;"></canvas>
         </div>
         <br>
-        <p>
-            <strong>Note:</strong> these statistics show fees for the
-            <u>average</u> tx size. For regular transactions (with few inputs/outputs) the median tx size is a more useful statistic but that data is currently not available.
-        </p>
-        <br>
         <stat-table :stats="stats"></stat-table>
     </div>
 </template>
@@ -49,7 +44,7 @@ export default {
         txfee(obj) {
             if (obj.blocks < 1 || obj.price < 1) return null
 
-            return this.sprintf('%.2f', (obj.reward_avg - (12.5 * 100000000)) / obj.txs / 1000)
+            return this.sprintf('%.2f', (obj.reward_avg - (12.5 * 100000000)) / obj.size)
         },
         redraw() {
             let labels = this.data.BTC.history['all'].map((obj) => moment.unix(obj.timestamp).format("MMM, DD HH:mm"))

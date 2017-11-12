@@ -96,7 +96,7 @@ export default {
                             position: 'right',
                             scaleLabel: {
                                 display: true,
-                                labelString: 'Number of block ahead'
+                                labelString: 'Block chain height'
                             },
                             ticks: {
                                 callback: (value, index, values) => {

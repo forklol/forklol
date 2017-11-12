@@ -8,9 +8,6 @@
             <canvas id="canvas-difficulty-expected" style="height: 512px;"></canvas>
         </div>
         <br>
-        <p>
-            When the actual difficulty is lower than the expected difficulty it can either mean that new hashrate has been added to the network or a chain difficulty is not well adjusted (e.g. BCH EDA mechanism).
-        </p>
     </div>
 </template>
 
@@ -31,7 +28,7 @@ export default {
 
 
             if(!a || !b) return null
-            
+
             if(b.height < 478600) return null
 
             return a.rate7d + b.rate7d
@@ -39,7 +36,7 @@ export default {
         actual(obj) {
             let a = this.ts_coin('BTC', obj.timestamp)
             let b = this.ts_coin('BCH', obj.timestamp)
-            
+
             if(!a || !b) return null
 
             if(b.height < 478600) return null
